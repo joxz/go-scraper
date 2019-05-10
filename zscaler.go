@@ -1,4 +1,8 @@
-//https://www.devdungeon.com/content/web-scraping-go
+// https://www.devdungeon.com/content/web-scraping-go
+// http://sandipbgt.com/2018/08/23/scraping-tutorial-with-golang/
+// https://edmundmartin.com/scraping-google-with-golang/
+// https://appdividend.com/2019/03/23/golang-receiver-function-tutorial-go-function-receivers-example/
+// https://blog.heroku.com/neither-self-nor-this-receivers-in-go
 
 package main
 
@@ -20,7 +24,7 @@ type ZscalerRegion struct {
 
 type ZscalerNode struct {
 	ZscalerRegion
-	Cidr string `json:"ip_prefix"`
+	Prefix string `json:"ip_prefix"`
 }
 
 type Zscaler struct {
@@ -47,7 +51,7 @@ func getIPs(zr []*ZscalerRegion) ([]ZscalerNode, error) {
 			for _, line := range strings.Split(strings.TrimSuffix(s.Text(), "\n"), "\n") {
 				var zn ZscalerNode
 				zn.ZRegion = v.ZRegion
-				zn.Cidr = strings.TrimSpace(line)
+				zn.Prefix = strings.TrimSpace(line)
 				znode = append(znode, zn)
 			}
 		})
