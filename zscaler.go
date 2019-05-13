@@ -24,7 +24,9 @@ type ZscalerRegion struct {
 
 type ZscalerNode struct {
 	ZscalerRegion
-	Prefix string `json:"ip_prefix"`
+	Prefix   string `json:"ip_prefix"`
+	Name     string `json:"hostname"`
+	Location string `json:"location"`
 }
 
 type Zscaler struct {
@@ -52,6 +54,14 @@ func getIPs(zr []*ZscalerRegion) ([]ZscalerNode, error) {
 				var zn ZscalerNode
 				zn.ZRegion = v.ZRegion
 				zn.Prefix = strings.TrimSpace(line)
+
+				doc.Find("#block-system-main > div > div > div > article > table > tbody > tr > td").Each(func(j int, sel *goquery.Selection) {
+					if strings.Contains(sel.Text(), string(line)) {
+						zn.Name = string(sel.Next().Text())
+						zn.Location = string(sel.Prev().Text())
+					}
+				})
+				
 				znode = append(znode, zn)
 			}
 		})
@@ -62,7 +72,7 @@ func getIPs(zr []*ZscalerRegion) ([]ZscalerNode, error) {
 
 func main() {
 
-	r := []*ZscalerRegion{
+	zreg := []*ZscalerRegion{
 		{
 			ZRegion: "Europe",
 			Element: "#div_europe",
@@ -85,12 +95,12 @@ func main() {
 		},
 	}
 
-	z, _ := getIPs(r)
+	res, _ := getIPs(zreg)
 
-	x := new(Zscaler)
-	cr := time.Now()
-	x.Created = cr
-	x.Prefixes = z
+	x := Zscaler{
+		Created:  time.Now(),
+		Prefixes: res,
+	}
 
 	out, err := json.Marshal(x)
 	if err != nil {
