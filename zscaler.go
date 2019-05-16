@@ -61,7 +61,7 @@ func getIPs(zr []*ZscalerRegion) ([]ZscalerNode, error) {
 						zn.Location = string(sel.Prev().Text())
 					}
 				})
-				
+
 				znode = append(znode, zn)
 			}
 		})
@@ -102,7 +102,7 @@ func main() {
 		Prefixes: res,
 	}
 
-	out, err := json.Marshal(x)
+	out, err := json.MarshalIndent(x, "", "    ")
 	if err != nil {
 		log.Fatal("JSON marshal error. ", err)
 	}
